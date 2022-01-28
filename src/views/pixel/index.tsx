@@ -1,5 +1,6 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import ImgIcon from "../../assets/img.svg";
+import RetinaCanvas from "../../components/RetinaCanvas";
 const devicePixelRatio = window.devicePixelRatio;
 function sleep(duration: number) {
   return new Promise((resolve) => {
@@ -23,16 +24,18 @@ const Pixel = () => {
   const pickerRef = useRef<HTMLInputElement | null>(null);
   const [resultImg, setResultImg] = useState("");
   const lock = useRef<number | null>(null);
-  const [canvas, setCanvas] = useState<OffscreenCanvas | null>(null);
   const [imgSource, setImgSource] = useState("");
   const [borderColor, setBorderColor] = useState("rgba(0,0,0,0)");
   const [loading, setLoading] = useState(true);
   const [file, setFile] = useState<File | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const render = useCallback(() => {
     if (lock.current) {
       clearTimeout(lock.current);
     }
     lock.current = window.setTimeout(async () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
       const ctx = canvas?.getContext("2d");
       if (!imgRef.current || !ctx || !canvas) return;
       const { naturalWidth: width, naturalHeight: height } = imgRef.current;
@@ -59,12 +62,12 @@ const Pixel = () => {
           ctx.strokeRect(...params);
         }
       }
-      const src = URL.createObjectURL(await canvas?.convertToBlob()!);
+      const src = canvasRef.current?.toDataURL() || "";
       setResultImg(src);
       await sleep(100); // render takes some time
       setLoading(false);
     }, 100);
-  }, [step, canvas, borderColor]);
+  }, [step, borderColor]);
   const onStepChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setStep(Number(e.target.value));
@@ -76,10 +79,8 @@ const Pixel = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     setFile(file);
+    setLoading(true);
     setImgSource(URL.createObjectURL(file));
-  }, []);
-  useEffect(() => {
-    setCanvas(new OffscreenCanvas(0, 0));
   }, []);
   return (
     <div className={`h-screen  flex flex-col ${imgSource ? "bg-gray-50" : "bg-white"}`}>
@@ -190,6 +191,7 @@ const Pixel = () => {
           保存到本地
         </a>
       </footer>
+      <RetinaCanvas ref={canvasRef} hidden />
     </div>
   );
 };

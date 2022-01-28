@@ -1,7 +1,6 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@types/offscreencanvas': ^2019.6.4
   '@types/react': ^17.0.0
   '@types/react-dom': ^17.0.0
   '@typescript-eslint/eslint-plugin': ^4.28.1
@@ -35,7 +34,6 @@ dependencies:
   react-dom: 17.0.2_react@17.0.2
 
 devDependencies:
-  '@types/offscreencanvas': 2019.6.4
   '@types/react': 17.0.38
   '@types/react-dom': 17.0.11
   '@typescript-eslint/eslint-plugin': 4.33.0_959502c0ea240e86d4d2ba8b8c0fee45
@@ -506,10 +504,6 @@ packages:
 
   /@types/normalize-package-data/2.4.1:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
-    dev: true
-
-  /@types/offscreencanvas/2019.6.4:
-    resolution: {integrity: sha512-u8SAgdZ8ROtkTF+mfZGOscl0or6BSj9A4g37e6nvxDc+YB/oDut0wHkK2PBBiC2bNR8TS0CPV+1gAk4fNisr1Q==}
     dev: true
 
   /@types/parse-json/4.0.0:
