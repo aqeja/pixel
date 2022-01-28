@@ -84,7 +84,7 @@ const Pixel = () => {
   return (
     <div className={`h-screen  flex flex-col ${imgSource ? "bg-gray-50" : "bg-white"}`}>
       <header className={`flex items-center shadow bg-white sticky top-0 py-2 px-4 ${imgSource ? "" : "invisible"}`}>
-        <img src="/site.png" className="w-10" alt="" />
+        <img src="site.png" className="w-10" alt="" />
       </header>
       <div className="flex-grow mt-10 flex items-center justify-center">
         <div className={`${imgSource ? "" : "invisible"}`}>
@@ -153,7 +153,7 @@ const Pixel = () => {
         >
           像素化你的图片
         </h1>
-        <img src="/pic.png" alt="" />
+        <img src="pic.png" alt="" />
 
         <Picker
           className="mt-10 mx-auto w-60 h-12 px-6 bg-gray-700 !text-white !border-none"
