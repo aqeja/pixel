@@ -1,7 +1,7 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import ImgIcon from "../../assets/img.svg";
 import RetinaCanvas from "../../components/RetinaCanvas";
-const devicePixelRatio = window.devicePixelRatio;
+const devicePixelRatio = 1;
 function sleep(duration: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, duration);
@@ -29,6 +29,7 @@ const Pixel = () => {
   const [loading, setLoading] = useState(true);
   const [file, setFile] = useState<File | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [shape, setShape] = useState("square");
   const render = useCallback(() => {
     if (lock.current) {
       clearTimeout(lock.current);
@@ -50,31 +51,39 @@ const Pixel = () => {
       for (let h = 0; h < height; h += GAP) {
         for (let w = 0; w < width; w += GAP) {
           if (!imgRef.current) return;
+          ctx.save();
           const params: [number, number, number, number] = [
             w * devicePixelRatio,
             h * devicePixelRatio,
             GAP * devicePixelRatio,
             GAP * devicePixelRatio,
           ];
+          if (shape === "circle") {
+            ctx.moveTo(params[0] + step / 2, params[1] + step / 2);
+            ctx.arc(params[0] + step / 2, params[1] + step / 2, step / 2, 0, Math.PI * 2);
+            ctx.clip();
+          }
           ctx.drawImage(imgRef.current, w, h, 1, 1, ...params);
+          // ctx.stroke();
           // ctx.lineWidth = 1;
           ctx.strokeStyle = borderColor;
           ctx.strokeRect(...params);
+          ctx.restore();
         }
       }
+
       const src = canvasRef.current?.toDataURL() || "";
       setResultImg(src);
       await sleep(100); // render takes some time
       setLoading(false);
     }, 100);
-  }, [step, borderColor]);
-  const onStepChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setStep(Number(e.target.value));
-      render();
-    },
-    [render],
-  );
+  }, [step, borderColor, shape]);
+  const onStepChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setStep(Number(e.target.value));
+  }, []);
+  const onShapeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setShape(e.target.value);
+  }, []);
   const onFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -82,6 +91,10 @@ const Pixel = () => {
     setLoading(true);
     setImgSource(URL.createObjectURL(file));
   }, []);
+  useEffect(() => {
+    if (!imgSource) return;
+    render();
+  }, [shape, step, render, imgSource]);
   return (
     <div className={`h-screen  flex flex-col ${imgSource ? "bg-gray-50" : "bg-white"}`}>
       <header className={`flex items-center shadow bg-white sticky top-0 py-2 px-4 ${imgSource ? "" : "invisible"}`}>
@@ -130,6 +143,18 @@ const Pixel = () => {
             <div className="mx-6">
               <p className="text-xs text-gray-400 mb-1">格子尺寸</p>
               <input type="range" min={1} max={100} step={1} value={step} onChange={onStepChange} />
+            </div>
+            <div className="mx-6">
+              <p className="text-xs text-gray-400 mb-1">像素形状</p>
+
+              <label>
+                <input type="radio" name="shape" value="square" onChange={onShapeChange} checked={shape === "square"} />
+                <span className="ml-1">正方形</span>
+              </label>
+              <label className="ml-4">
+                <input type="radio" name="shape" value="circle" onChange={onShapeChange} checked={shape === "circle"} />
+                <span className="ml-1">圆形</span>
+              </label>
             </div>
             <div className="mx-6 hidden">
               <p className="text-xs text-gray-400 mb-1">边框颜色</p>

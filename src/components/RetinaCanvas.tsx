@@ -2,8 +2,9 @@ import React, { useCallback, useEffect, useRef } from "react";
 
 const RetinaCanvas = React.forwardRef<
   HTMLCanvasElement,
-  Omit<React.HTMLProps<HTMLCanvasElement>, "width" | "height"> & Partial<Record<"width" | "height", number>>
->(({ width = 0, height = 0, ...props }, ref) => {
+  Omit<React.HTMLProps<HTMLCanvasElement>, "width" | "height"> &
+    Partial<Record<"width" | "height", number> & { ratio?: number }>
+>(({ width = 0, height = 0, ratio = 1, ...props }, ref) => {
   const realRef = useRef<HTMLCanvasElement | null>(null);
   const getRef = useCallback(
     (el: HTMLCanvasElement) => {
@@ -20,7 +21,6 @@ const RetinaCanvas = React.forwardRef<
     const el = realRef.current;
     const ctx = el?.getContext("2d");
     if (!el || !ctx) return;
-    const ratio = window.devicePixelRatio || 1;
     if (width !== 0 && height !== 0) {
       el.style.width = `${width}px`;
       el.style.height = `${height}px`;
@@ -29,7 +29,7 @@ const RetinaCanvas = React.forwardRef<
     el.width = width * ratio;
     el.height = height * ratio;
     ctx.scale(ratio, ratio);
-  }, [realRef, width, height]);
+  }, [realRef, width, height, ratio]);
   return <canvas {...props} ref={getRef}></canvas>;
 });
 
